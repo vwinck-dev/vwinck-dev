@@ -4,17 +4,17 @@ Welcome to my GitHub profile! I'm a junior backend developer passionate about te
 
 ## About Me
 
-- 🌍 **Location:** Salvador, Brazil
-- 💼 **Job:** Backend Developer in Web
-- 🎓 **Education:** Currently pursuing a degree in Software Engineering
+- 🌍 **Location:** Salvador, Brazil;
+- 💼 **Job:** Backend Developer in WebDev!
+- 🎓 **Education:** Currently pursuing a degree in Software Engineering!
 - 🔧 **Technologies & Tools:**
-  - Programming Languages: C++, PHP, Python, JavaScript
-  - Frameworks: Bootstrap, Laravel
-  - Tools: MySQL, Linux (Arch)
+  - Programming Languages: C++, PHP, Python, JavaScript;
+  - Frameworks: Bootstrap, Laravel;
+  - Tools: MySQL, Arch Linux, Debian, Kali.
 
 ## Featured Projects
 
-Currently, I’m new to GitHub and don’t have featured projects yet. Stay tuned for interesting projects to come!
+Currently, I’m new to GitHub and don’t have featured any projects (yet). Stay tuned for interesting projects to come!
 
 ## GitHub Stats
 
@@ -31,8 +31,8 @@ Currently, I’m new to GitHub and don’t have featured projects yet. Stay tune
 
 ## Interests
 
-I am studying cybersecurity, Linux, and programming. I enjoy exploring new technologies and learning more about securing systems and networks.
+I am currently studying cybersecurity, Linux, and programming. I have a passion for exploring new technologies and deepening my understanding of system and network security. In my free time, you can find me on [Chess.com](https://www.chess.com/member/vwinck), where I enjoy playing chess!
 
 ## Acknowledgments
 
-Thank you for visiting my profile! If you like what you see, feel free to follow me and star my projects when I publish them. 😄
+Thank you for visiting my profile! If you like what you see, feel free to follow me and star my projects when I publish them. 🖥
