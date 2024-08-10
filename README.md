@@ -1,6 +1,8 @@
 # Hello, I'm V. Winck 👋
 
-Welcome to my GitHub profile! I'm a junior backend developer passionate about technology and innovative solutions. Here you’ll find some of my activities and contributions in the fields of development and cybersecurity.
+Welcome to my GitHub profile!
+I'm a junior backend developer passionate about technology and innovative solutions.
+Here you’ll find some of my activities and contributions in the fields of development and cybersecurity.
 
 ## About Me
 
