@@ -6,7 +6,7 @@ Here you’ll find some of my activities and contributions in the fields of deve
 
 ## About Me
 
-- 🌍 **Location:** Salvador, Brazil;
+- 🌍 **Location:** Bahia, Brazil;
 - 💼 **Job:** Backend Developer in WebDev!
 - 🎓 **Education:** Currently pursuing a degree in Software Engineering!
 - 🔧 **Technologies & Tools:**
@@ -16,7 +16,7 @@ Here you’ll find some of my activities and contributions in the fields of deve
 
 ## Featured Projects
 
-Currently, I’m new to GitHub and don’t have featured any projects (yet). Stay tuned for interesting projects to come!
+Currently, I’m new to GitHub and don’t have featured any projects (yet). Stay tuned for interesting things to come!
 
 ## GitHub Stats
 
