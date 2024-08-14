@@ -21,7 +21,7 @@ Currently, I’m new to GitHub and don’t have featured any projects (yet). Sta
 ## GitHub Stats
 
 ![GitHub Stats](https://github-readme-stats.vercel.app/api?username=vwinck-dev&show_icons=true&hide_title=true&hide=prs&count_private=true&hide_border=true&theme=radical)
-[![Top Langs](https://github-readme-stats-git-masterrstaa-rickstaa.vercel.app/api/top-langs/?username=vwinck-dev)](https://github.com/anuraghazra/github-readme-stats)
+ ![Top Langs](https://github-readme-stats.vercel.app/api/top-langs/?username=vwinck-dev&hide=javascript,css,scss,html&theme=tokyonight)
 ## Contributions
 
 ![Contribution Graph](https://github-readme-streak-stats.herokuapp.com/?user=vwinck-dev&theme=radical)
