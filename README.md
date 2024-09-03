@@ -11,8 +11,9 @@ Here you’ll find some of my activities and contributions in the fields of deve
 - 🎓 **Education:** Currently pursuing a degree in Software Engineering!
 - 🔧 **Technologies & Tools:**
   - Programming Languages: C++, PHP, Python, JavaScript;
-  - Frameworks: Bootstrap, Laravel;
-  - Tools: MySQL, Arch Linux, Debian, Kali.
+  - Database management: MySQL workplace & DBeaver;
+  - Frameworks: Bootstrap, Laravel, Composer;
+  - Tools: MySQL, Arch Linux, Debian, Kali, Mint Linux, Windows.
 
 ## Featured Projects
 
