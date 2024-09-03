@@ -13,7 +13,7 @@ Here you’ll find some of my activities and contributions in the fields of deve
   - Programming Languages: C++, PHP, Python, JavaScript;
   - Database management: MySQL workplace & DBeaver;
   - Frameworks: Bootstrap, Laravel, Composer;
-  - Tools: MySQL, Arch Linux, Debian, Kali, Mint Linux, Windows.
+  - Tools: Arch Linux, Debian, Kali, Mint Linux, Windows.
 
 ## Featured Projects
 
