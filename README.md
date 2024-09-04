@@ -19,10 +19,11 @@ Here you’ll find some of my activities and contributions in the fields of deve
 
 Currently, I’m new to GitHub and don’t have featured any projects (yet). Stay tuned for interesting things to come!
 
-## GitHub Stats
+## Stats
 
 ![GitHub Stats](https://github-readme-stats.vercel.app/api?username=vwinck-dev&show_icons=true&hide_title=true&hide=prs&count_private=true&hide_border=true&theme=radical)
  ![Top Langs](https://github-readme-stats.vercel.app/api/top-langs/?username=vwinck-dev&hide=javascript,css,scss,html&theme=tokyonight)
+ [![roadmap.sh](https://roadmap.sh/card/tall/66a64f00ee6a29a2edc961bb?variant=dark&roadmaps=sql%2Cbackend%2C66d700a5553501e3c3ebc7c1%2Clinux)](https://roadmap.sh)
 ## Contributions
 
 ![Contribution Graph](https://github-readme-streak-stats.herokuapp.com/?user=vwinck-dev&theme=radical)
