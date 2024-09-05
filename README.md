@@ -23,7 +23,7 @@ Currently, I’m new to GitHub and don’t have featured any projects (yet). Sta
 
 ![GitHub Stats](https://github-readme-stats.vercel.app/api?username=vwinck-dev&show_icons=true&hide_title=true&hide=prs&count_private=true&hide_border=true&theme=radical)
  ![Top Langs](https://github-readme-stats.vercel.app/api/top-langs/?username=vwinck-dev&hide=javascript,css,scss,html&theme=tokyonight)
- [![roadmap.sh](https://roadmap.sh/card/tall/66a64f00ee6a29a2edc961bb?variant=dark&roadmaps=sql%2Cbackend%2C66d700a5553501e3c3ebc7c1%2Clinux)](https://roadmap.sh)
+ [![roadmap.sh](https://roadmap.sh/card/tall/66a64f00ee6a29a2edc961bb?variant=dark&roadmaps=backend%2Clinux%2Csql%2C66d700a5553501e3c3ebc7c1)](https://roadmap.sh)
 ## Contributions
 
 ![Contribution Graph](https://github-readme-streak-stats.herokuapp.com/?user=vwinck-dev&theme=radical)
