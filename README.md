@@ -30,7 +30,7 @@ Currently, I’m new to GitHub and don’t have featured any projects (yet). Sta
 
 ## Contact
 
-- ✉️ **Discord:** [nronqsr](https://discord.com/users/nronqsr)
+- ✉️ **Email:** (vwicnknascimento@gmail.com)
 
 ## Interests
 
