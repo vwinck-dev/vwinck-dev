@@ -10,7 +10,7 @@ Here you’ll find some of my activities and contributions in the fields of deve
 - 💼 **Job:** Backend Developer in WebDev!
 - 🎓 **Education:** Currently pursuing a degree in Software Engineering!
 - 🔧 **Technologies & Tools:**
-  - Programming Languages: C++, PHP, Python, JavaScript;
+  - Programming Languages: PHP, C++, Python, JavaScript;
   - Database management: MySQL workplace & DBeaver;
   - Frameworks: Bootstrap, Laravel, Composer;
   - Tools: Arch Linux, Debian, Kali, Mint Linux, Windows.
