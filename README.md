@@ -6,7 +6,6 @@ Here you’ll find some of my activities and contributions in the fields of deve
 
 ## About Me
 
-- 🌍 **Location:** Bahia, Brazil;
 - 💼 **Job:** Backend Developer in WebDev!
 - 🎓 **Education:** Currently pursuing a degree in Software Engineering!
 - 🔧 **Technologies & Tools:**
@@ -23,9 +22,6 @@ Currently, I’m new to GitHub and don’t have featured any projects (yet). Sta
 
 ![GitHub Stats](https://github-readme-stats.vercel.app/api?username=vwinck-dev&show_icons=true&hide_title=true&hide=prs&count_private=true&hide_border=true&theme=radical)
 ![Top Langs](https://github-readme-stats.vercel.app/api/top-langs/?username=vwinck-dev&theme=tokyonight)
-## Contributions
-
-![Contribution Graph](https://github-readme-streak-stats.herokuapp.com/?user=vwinck-dev&theme=radical)
 
 ## Contact
 
