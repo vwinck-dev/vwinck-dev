@@ -1,36 +1,67 @@
 # Hello, I'm V. Winck 👋
 
 Welcome to my GitHub profile!
-I'm a backend developer passionate about technology and innovative solutions.
-Here you’ll find some of my activities and contributions in the fields of development and cybersecurity.
+I'm a **Backend Developer** focused on clean architecture, scalable systems, and creative solutions.
+Here you’ll find my experiments, contributions, and projects that mix **web development, C++ systems, and cybersecurity**.
 
-## About Me
+---
 
-- 💼 **Job:** Backend Developer in WebDev!
-- 🎓 **Education:** Currently pursuing a degree in Software Engineering!
-- 🔧 **Technologies & Tools:**
-  - Programming Languages: PHP, C++, Python, JavaScript;
-  - Database management: MySQL workplace & DBeaver;
-  - Frameworks: Bootstrap, Laravel, Composer;
-  - Tools: Arch Linux, Debian, Kali, Mint Linux, Windows.
+## 🚀 About Me
 
-## Featured Projects
+* 💼 **Job:** Backend Developer (Laravel ecosystem);
+* 🎓 **Education:** Software Engineering student;
+* 🌱 **Currently learning:** Docker, Kubernetes, and intermediate C++;
+* 🏗 **Current challenge:** Building a biometric-based check-in system (Laravel + C++ SDK integration);
+* 🗣 **Languages:** Brazilian Portuguese (native), English (proficient), Japanese (learning).
 
-Currently, I’m new to GitHub and don’t have featured any projects (yet). Stay tuned for interesting things to come!
+---
 
-## Stats
+## 🛠️ Tech Stack & Tools
 
-![GitHub Stats](https://github-readme-stats.vercel.app/api?username=vwinck-dev&show_icons=true&hide_title=true&hide=prs&count_private=true&hide_border=true&theme=radical)
-![Top Langs](https://github-readme-stats.vercel.app/api/top-langs/?username=vwinck-dev&theme=tokyonight)
+* **Programming Languages:** PHP (Laravel 12), C++, Python, JavaScript, C, INO;
+* **Frameworks & Libraries:** Laravel, Tailwind CSS, Bootstrap;
+* **Databases:** MySQL (DBeaver, Workbench);
+* **DevOps / Infra:** Docker, Kubernetes (WIP), Laravel Sail;
+* **Testing & Quality:** PestPHP, Larastan, RectorPHP, CaptainHook, SonarQube (WIP);
+* **Debugging & Workflow:** XDebug, Composer, Node.js + NPM, Git (semantic commits, rebase + squash).
+* **Operating Systems:** Arch Linux (btw 😏), Debian, Kali, Mint, Windows.
 
-## Contact
+---
 
-- ✉️ **Email:** (vwicnknascimento@gmail.com)
+## 📌 Featured Projects
 
-## Interests
+* 🔐 **Biometric Check-In System** – Laravel + C++ (Futronic SDK) integration for workplace attendance *(private)*;
+* 🏗 **Clean Architecture Laravel** – reusable boilerplate focused on maintainability *(coming soon 👀)*;
+* 🌴 **Vacation Management System** – PHP (no framework) *(private)*;
+* 📂 **Other Projects** – I’m currently short on time for open-source, but future repos are on the way.
 
-I am currently studying cybersecurity, Linux, and programming. I have a passion for exploring new technologies and deepening my understanding of system and network security. In my free time, you can find me on [Chess.com](https://www.chess.com/member/vwinck), where I enjoy playing chess!
+---
 
-## Acknowledgments
+## 📊 Stats
 
-Thank you for visiting my profile! If you like what you see, feel free to follow me and star my projects when I publish them. 🖥
+![GitHub Stats](https://github-readme-stats.vercel.app/api?username=vwinck-dev\&show_icons=true\&hide_title=true\&hide=prs\&count_private=true\&hide_border=true\&theme=radical)
+![Top Langs](https://github-readme-stats.vercel.app/api/top-langs/?username=vwinck-dev\&theme=tokyonight)
+
+---
+
+## 📬 Contact
+
+* ✉️ **Email:** [vwincknascimento@gmail.com](mailto:vwincknascimento@gmail.com)
+
+---
+
+## 🎯 Interests
+
+I’m passionate about:
+
+* **Backend development** with clean architecture and scalability in mind;
+* **Cybersecurity & Linux** (always tinkering with configs and tools);
+* **Low-level systems** (currently working with C++ biometric SDKs);
+* **Languages & culture** (studying Japanese with a goal to live in Japan 🇯🇵 in the future).
+
+---
+
+## 🙌 Thanks for visiting!
+
+If you like what you see, drop a follow or star my projects.
+Big things are coming. 🖥️
