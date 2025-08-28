@@ -22,7 +22,7 @@ Here you’ll find my experiments, contributions, and projects that mix **web de
 * **Frameworks & Libraries:** Laravel, Tailwind CSS, Bootstrap;
 * **Databases:** MySQL (DBeaver, Workbench);
 * **DevOps / Infra:** Docker, Kubernetes (WIP), Laravel Sail;
-* **Testing & Quality:** PestPHP, Larastan, RectorPHP, CaptainHook, SonarQube (WIP);
+* **Testing & Quality:** PestPHP, Laravel Pint, Larastan, RectorPHP, CaptainHook, SonarQube (WIP);
 * **Debugging & Workflow:** XDebug, Composer, Node.js + NPM, Git (semantic commits, rebase + squash).
 * **Operating Systems:** Arch Linux (btw 😏), Debian, Kali, Mint, Windows.
 
