@@ -1,7 +1,7 @@
 <pre>
 <b>vwinck@arch</b> ~ $ whoami
 
-  Vinícius Winck — fullstack developer, Brazil
+  Valentine Winck — fullstack developer, Brazil
   PHP · Laravel · clean architecture · software engineering undergrad
 
 <b>vwinck@arch</b> ~ $ ls ~/projects
