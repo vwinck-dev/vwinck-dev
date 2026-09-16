@@ -1,1 +1,3 @@
 .remember/
+__pycache__/
+*.pyc
