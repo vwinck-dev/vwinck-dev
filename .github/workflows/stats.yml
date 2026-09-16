@@ -17,10 +17,12 @@ on:
 permissions:
   contents: write
 
-# actions_branch is written by this workflow and by terminal.yml. Serialise
-# them so one never force-pushes over the other's freshly published files.
+# One group per workflow, not one shared group: GitHub keeps a single
+# pending run per concurrency group, so sharing one with terminal.yml did not
+# queue the two workflows -- it cancelled whichever lost the race, on every
+# push. They still both write to actions_branch; the publish step rebases.
 concurrency:
-  group: actions_branch
+  group: ${{ github.workflow }}-actions_branch
   cancel-in-progress: false
 
 jobs:
@@ -99,4 +101,13 @@ jobs:
           git rm -r --cached --ignore-unmatch --quiet out
           git add -- ./*.svg
           git commit -m "Update generated stats images" || echo "no changes"
-          git push origin actions_branch
+          # Both workflows run in parallel and write to the same branch, so
+          # losing the race is routine: rebase onto whatever landed first and
+          # try again, rather than forcing over the other one's files.
+          for attempt in 1 2 3 4 5; do
+            git push origin actions_branch && exit 0
+            echo "push rejected on attempt ${attempt}, rebasing"
+            git pull --rebase origin actions_branch
+            sleep $(( attempt * 5 ))
+          done
+          exit 1
