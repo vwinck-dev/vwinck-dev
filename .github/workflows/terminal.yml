@@ -1,0 +1,64 @@
+# MIT License
+#
+# Copyright (c) 2026 vwinck-dev <https://github.com/vwinck-dev>
+# SPDX-License-Identifier: MIT
+#
+# Full terms in the LICENSE file at the repository root.
+
+name: Build Terminal SVG
+
+# No paths filter: GitHub does not evaluate one against a force push that
+# rewrites history, which once left the README pointing at SVGs that were
+# never published. The build takes seconds and needs no secret, so running it
+# on every push costs less than the profile being broken.
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+# actions_branch is written by this workflow and by stats.yml. Serialise them
+# so one never publishes over the other's freshly generated files.
+concurrency:
+  group: actions_branch
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout profile repo
+        uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # No dependencies and no secrets: the generator is stdlib-only, so this
+      # runs even when the stats workflow is failing for lack of a token.
+      - name: Render the terminal
+        run: python3 scripts/build_terminal.py --source terminal.txt --out-dir out
+
+      - name: Publish to actions_branch
+        run: |
+          set -euo pipefail
+          git config user.name  "github-stats[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git fetch origin actions_branch || true
+          if git rev-parse --verify origin/actions_branch >/dev/null 2>&1; then
+            git checkout -B actions_branch origin/actions_branch
+          else
+            git checkout --orphan actions_branch
+            git rm -rf --cached . >/dev/null 2>&1 || true
+            find . -maxdepth 1 -mindepth 1 ! -name .git ! -name out -exec rm -rf {} +
+          fi
+          cp out/*.svg .
+          # Drop the build directory before staging: a bare '*.svg' pathspec
+          # is repo-wide and would publish out/ alongside the real files.
+          rm -rf out
+          git rm -r --cached --ignore-unmatch --quiet out
+          git add -- ./*.svg
+          git commit -m "Update generated terminal" || echo "no changes"
+          git push origin actions_branch
