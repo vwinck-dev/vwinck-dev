@@ -1,3 +1,10 @@
+# MIT License
+#
+# Copyright (c) 2026 vwinck-dev <https://github.com/vwinck-dev>
+# SPDX-License-Identifier: MIT
+#
+# Full terms in the LICENSE file at the repository root.
+
 # The generator is stdlib-only, so this image installs nothing: it exists to
 # pin the interpreter, not to carry dependencies.
 FROM python:3.12-slim

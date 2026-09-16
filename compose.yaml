@@ -1,3 +1,10 @@
+# MIT License
+#
+# Copyright (c) 2026 vwinck-dev <https://github.com/vwinck-dev>
+# SPDX-License-Identifier: MIT
+#
+# Full terms in the LICENSE file at the repository root.
+
 # docker compose run --rm test     -> run the suite
 # docker compose run --rm build    -> regenerate the terminal SVGs into out/
 #

@@ -1,4 +1,11 @@
 #!/usr/bin/env bash
+# MIT License
+#
+# Copyright (c) 2026 vwinck-dev <https://github.com/vwinck-dev>
+# SPDX-License-Identifier: MIT
+#
+# Full terms in the LICENSE file at the repository root.
+
 # Runs the generator's test suite, and refuses commits that would leave the
 # published terminal out of sync with terminal.txt.
 #

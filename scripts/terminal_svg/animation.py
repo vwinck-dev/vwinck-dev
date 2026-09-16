@@ -1,3 +1,10 @@
+# MIT License
+#
+# Copyright (c) 2026 vwinck-dev <https://github.com/vwinck-dev>
+# SPDX-License-Identifier: MIT
+#
+# Full terms in the LICENSE file at the repository root.
+
 """CSS keyframes that drive the terminal.
 
 Every animated element shares one ``animation-duration`` -- the full cycle --

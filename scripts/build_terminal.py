@@ -1,4 +1,11 @@
 #!/usr/bin/env python3
+# MIT License
+#
+# Copyright (c) 2026 vwinck-dev <https://github.com/vwinck-dev>
+# SPDX-License-Identifier: MIT
+#
+# Full terms in the LICENSE file at the repository root.
+
 """Render ``terminal.txt`` as a pair of self-animating SVG terminals.
 
 GitHub strips ``<script>`` and ``<style>`` from README markup, but it serves
