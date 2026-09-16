@@ -103,3 +103,15 @@ class WorkflowContractTest(unittest.TestCase):
             self.terminal["concurrency"]["group"],
             self.stats["concurrency"]["group"],
         )
+
+    def test_publish_stages_only_root_level_files(self) -> None:
+        """Regression: a bare '*.svg' pathspec is repo-wide, so the build
+        directory was published into actions_branch alongside the real
+        files."""
+        for name, workflow in (("terminal", self.terminal), ("stats", self.stats)):
+            with self.subTest(workflow=name):
+                steps = workflow["jobs"]["build"]["steps"]
+                script = "\n".join(step.get("run", "") for step in steps)
+                self.assertNotRegex(script, r"git add -- '\*\.svg'")
+                self.assertIn("git add -- ./*.svg", script)
+

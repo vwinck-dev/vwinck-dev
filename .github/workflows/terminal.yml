@@ -55,6 +55,10 @@ jobs:
             find . -maxdepth 1 -mindepth 1 ! -name .git ! -name out -exec rm -rf {} +
           fi
           cp out/*.svg .
-          git add -- '*.svg'
+          # Drop the build directory before staging: a bare '*.svg' pathspec
+          # is repo-wide and would publish out/ alongside the real files.
+          rm -rf out
+          git rm -r --cached --ignore-unmatch --quiet out
+          git add -- ./*.svg
           git commit -m "Update generated terminal" || echo "no changes"
           git push origin actions_branch
