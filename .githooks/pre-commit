@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+# Runs the generator's test suite, and refuses commits that would leave the
+# published terminal out of sync with terminal.txt.
+#
+# Enable with: git config core.hooksPath .githooks
+set -euo pipefail
+
+run_python() {
+  if [ "${TERMINAL_SVG_DOCKER:-0}" = "1" ]; then
+    docker compose run --rm test
+  else
+    python3 -m unittest discover -s scripts/tests -t scripts
+  fi
+}
+
+staged() {
+  git diff --cached --name-only --diff-filter=ACM
+}
+
+if staged | grep -qE '^scripts/'; then
+  echo "pre-commit: running terminal_svg tests"
+  run_python
+fi
+
+if staged | grep -qE '^(terminal\.txt|scripts/)'; then
+  echo "pre-commit: checking the terminal still renders"
+  tmp="$(mktemp -d)"
+  trap 'rm -rf "$tmp"' EXIT
+  python3 scripts/build_terminal.py --source terminal.txt --out-dir "$tmp" >/dev/null
+fi
