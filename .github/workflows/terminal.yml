@@ -7,13 +7,13 @@
 
 name: Build Terminal SVG
 
+# No paths filter: GitHub does not evaluate one against a force push that
+# rewrites history, which once left the README pointing at SVGs that were
+# never published. The build takes seconds and needs no secret, so running it
+# on every push costs less than the profile being broken.
 on:
   push:
     branches: [ main ]
-    paths:
-      - 'terminal.txt'
-      - 'scripts/build_terminal.py'
-      - '.github/workflows/terminal.yml'
   workflow_dispatch:
 
 permissions:

@@ -14,6 +14,10 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /repo
 
+# Test-only dependency. The generator imports nothing outside the stdlib.
+COPY requirements-dev.txt .
+RUN pip install --no-cache-dir -r requirements-dev.txt
+
 # Run as a non-root user so files written into the mounted volume are not
 # owned by root on the host.
 ARG UID=1000
