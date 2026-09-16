@@ -37,6 +37,15 @@ STATS_WORKFLOW = REPO / ".github" / "workflows" / "stats.yml"
 PUBLISH_BRANCH = "actions_branch"
 DEFAULT_BRANCH = "main"
 
+# GitHub retires the Node runtime an action targets and then forces newer
+# actions onto the current one, warning on every run until the pin moves.
+# These are the first majors of each first-party action to target Node 24.
+MINIMUM_ACTION_MAJORS = {
+    "actions/checkout": 5,
+    "actions/setup-python": 6,
+}
+USES_PATTERN = re.compile(r"^(?P<action>[^@]+)@v(?P<major>\d+)")
+
 needs_yaml = unittest.skipIf(yaml is None, "PyYAML not installed")
 
 
@@ -103,6 +112,30 @@ class WorkflowContractTest(unittest.TestCase):
             self.terminal["concurrency"]["group"],
             self.stats["concurrency"]["group"],
         )
+
+    def test_first_party_actions_run_on_a_supported_node_runtime(self) -> None:
+        """Regression: checkout@v4 and setup-python@v5 target Node 20, which
+        GitHub deprecated -- every run ended with a warning."""
+        for name, workflow in (("terminal", self.terminal), ("stats", self.stats)):
+            for step in workflow["jobs"]["build"]["steps"]:
+                uses = step.get("uses")
+                if uses is None:
+                    continue
+                match = USES_PATTERN.match(uses)
+                self.assertIsNotNone(match, f"{uses} is not pinned to a major")
+                action = match.group("action")
+                if not action.startswith("actions/"):
+                    continue
+                with self.subTest(workflow=name, action=uses):
+                    self.assertIn(
+                        action,
+                        MINIMUM_ACTION_MAJORS,
+                        "a first-party action with no known Node floor",
+                    )
+                    self.assertGreaterEqual(
+                        int(match.group("major")),
+                        MINIMUM_ACTION_MAJORS[action],
+                    )
 
     def test_publish_stages_only_root_level_files(self) -> None:
         """Regression: a bare '*.svg' pathspec is repo-wide, so the build
