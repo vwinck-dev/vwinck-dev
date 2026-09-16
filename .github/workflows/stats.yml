@@ -10,6 +10,12 @@ on:
 permissions:
   contents: write
 
+# actions_branch is written by this workflow and by terminal.yml. Serialise
+# them so one never force-pushes over the other's freshly published files.
+concurrency:
+  group: actions_branch
+  cancel-in-progress: false
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -71,10 +77,15 @@ jobs:
           set -euo pipefail
           git config user.name  "github-stats[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git checkout --orphan actions_branch
-          git rm -rf --cached . >/dev/null
-          find . -maxdepth 1 -mindepth 1 ! -name .git ! -name out -exec rm -rf {} +
-          mv out/*.svg . && rmdir out
+          git fetch origin actions_branch || true
+          if git rev-parse --verify origin/actions_branch >/dev/null 2>&1; then
+            git checkout -B actions_branch origin/actions_branch
+          else
+            git checkout --orphan actions_branch
+            git rm -rf --cached . >/dev/null 2>&1 || true
+            find . -maxdepth 1 -mindepth 1 ! -name .git ! -name out -exec rm -rf {} +
+          fi
+          cp out/*.svg .
           git add -- '*.svg'
-          git commit -m "Update generated stats images"
-          git push --force origin actions_branch
+          git commit -m "Update generated stats images" || echo "no changes"
+          git push origin actions_branch
