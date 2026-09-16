@@ -1,0 +1,23 @@
+# docker compose run --rm test     -> run the suite
+# docker compose run --rm build    -> regenerate the terminal SVGs into out/
+#
+# Both mount the repo, so build writes straight back onto the host.
+
+x-python: &python
+  build:
+    context: .
+    args:
+      UID: ${UID:-1000}
+      GID: ${GID:-1000}
+  volumes:
+    - .:/repo
+  working_dir: /repo
+
+services:
+  test:
+    <<: *python
+    command: python3 -m unittest discover -s scripts/tests -t scripts -v
+
+  build:
+    <<: *python
+    command: python3 scripts/build_terminal.py --source terminal.txt --out-dir out
