@@ -1,0 +1,80 @@
+name: Generate Stats Images
+
+on:
+  schedule:
+    - cron: "0 5 * * *"
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout profile repo
+        uses: actions/checkout@v4
+
+      - name: Fetch the stats generator
+        run: |
+          git clone --depth 1 https://github.com/rahul-jha98/github-stats-transparent.git generator
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install requirements
+        run: python3 -m pip install -r generator/requirements.txt
+
+      # The generator writes a single transparent card. GitHub can serve a
+      # different image per theme via #gh-dark-mode-only / #gh-light-mode-only,
+      # so we run it twice with a different CSS palette baked into the template.
+      - name: Generate images
+        env:
+          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+          EXCLUDED: ${{ secrets.EXCLUDED }}
+          EXCLUDED_LANGS: ${{ secrets.EXCLUDED_LANGS }}
+          COUNT_STATS_FROM_FORKS: ${{ secrets.COUNT_STATS_FROM_FORKS }}
+        run: |
+          set -euo pipefail
+          cd generator
+          cp -r templates templates.orig
+          mkdir -p ../out
+
+          paint() {
+            # $1 border  $2 accent  $3 body text  $4 muted/icons
+            rm -rf templates && cp -r templates.orig templates
+            sed -i \
+              -e "s/stroke: #8B8B8B22;/stroke: $1;/" \
+              -e "s/rgb(72, 148, 224)/$2/g" \
+              -e "s/rgb(145, 145, 145)/$3/g" \
+              -e "s/rgb(135, 135, 135)/$3/g" \
+              -e "s/rgb(150,150,150)/$3/g" \
+              -e "s/rgb(139, 139, 139)/$4/g" \
+              templates/overview.svg templates/languages.svg
+          }
+
+          paint "#444c56" "#539bf5" "#adbac7" "#768390"
+          python3 generate_images.py
+          cp generated/overview.svg  ../out/overviewDarkMode.svg
+          cp generated/languages.svg ../out/languagesDarkMode.svg
+
+          paint "#d0d7de" "#0969da" "#24292f" "#57606a"
+          python3 generate_images.py
+          cp generated/overview.svg  ../out/overviewLightMode.svg
+          cp generated/languages.svg ../out/languagesLightMode.svg
+
+      - name: Publish to actions_branch
+        run: |
+          set -euo pipefail
+          git config user.name  "github-stats[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout --orphan actions_branch
+          git rm -rf --cached . >/dev/null
+          find . -maxdepth 1 -mindepth 1 ! -name .git ! -name out -exec rm -rf {} +
+          mv out/*.svg . && rmdir out
+          git add -- '*.svg'
+          git commit -m "Update generated stats images"
+          git push --force origin actions_branch
