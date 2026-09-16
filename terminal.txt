@@ -44,10 +44,20 @@ $ cat ~/stack
 
 $ git log --author="V. Winck" --oneline
 
-  e4d5f6a  refactor and harden legacy php 5.x systems up to 8.x
-  b7c8d9e  integrate laravel with futronic c++ sdk (biometric check-in)
-  a1b2c3d  build multilingual apps, pdf/excel reports from db streams
-  f0e1d2c  mentor junior devs through code review and pair programming
+  18428f3  fix(security): path traversal, phpinfo exposure, password hash
+  02aae99  fix(security): sqli, xss and csrf in a legacy php 5.x portal
+  4309ee1  fix(auth): close an auth bypass and a broken ckfinder base url
+  d0278dd  refactor(core): domain enums, zero magic literals policy
+  6036c44  feat(filament): finish the laravel nova to filament 5 migration
+  81d25a9  feat(a11y): wcag, high contrast and mobile on a public portal
+  88c3ad4  fix(okd): securityContext for openshift PodSecurity restricted
+  7a8dc40  fix(pdf): resolve gateway timeout on massive pdf generation
+  5139c19  feat(cache): resource-based caching and invalidation system
+  17fad1b  feat(auth): single sign-on for a municipal education program
+  7bc3092  feat(console): artisan lang commands for laravel-translator
+  40bb2f1  feat(presence): discord rich presence for a snes emulator
+  d90a73e  feat(demo): interactive dos attack demo with live mitigation
+  62a327a  refactor: drop duplicated methods across controllers and models
 
 $ cat ~/.contact
 
