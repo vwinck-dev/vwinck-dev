@@ -13,6 +13,11 @@ from .animation import CssClass, KeyframeFactory
 from .geometry import FONT_STACK, Metrics
 from .theme import Palette
 
+#: The session plays once and holds its final state. A README is read, not
+#: watched: a loop is noise, and it forces a rushed cadence to keep the box
+#: from sitting empty for most of the cycle.
+ANIMATION_ITERATIONS = 1
+
 
 class StyleSheet:
     """Builds the ``<style>`` body for one themed document."""
@@ -52,7 +57,8 @@ class StyleSheet:
         return (
             f"{self._animated_selector()}{{"
             f"animation-duration:{cycle_seconds:.3f}s;"
-            f"animation-iteration-count:infinite;animation-fill-mode:both;}}"
+            f"animation-iteration-count:{ANIMATION_ITERATIONS};"
+            f"animation-fill-mode:both;}}"
         )
 
     def _reduced_motion(self) -> str:

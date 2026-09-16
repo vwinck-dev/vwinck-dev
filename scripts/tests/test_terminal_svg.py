@@ -166,6 +166,13 @@ class RendererTest(unittest.TestCase):
         defined = set(re.findall(r"@keyframes\s+([A-Za-z0-9_-]+)", self.svg))
         self.assertEqual(referenced - defined, set())
 
+    def test_the_session_plays_once_and_keeps_its_final_state(self) -> None:
+        """A profile README is read, not watched: replaying forever is noise,
+        and it forced a rushed cadence to keep the box from sitting empty."""
+        counts = set(re.findall(r"animation-iteration-count:([^;}]+)", self.svg))
+        self.assertEqual(counts, {"1"})
+        self.assertIn("animation-fill-mode:both", self.svg)
+
     def test_all_elements_share_one_cycle_duration(self) -> None:
         durations = set(re.findall(r"animation-duration:([^;}]+)", self.svg))
         self.assertEqual(len(durations), 1)
