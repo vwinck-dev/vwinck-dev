@@ -46,6 +46,14 @@ MINIMUM_ACTION_MAJORS = {
 }
 USES_PATTERN = re.compile(r"^(?P<action>[^@]+)@v(?P<major>\d+)")
 
+# GitHub keeps at most one *pending* run per concurrency group, so a shared
+# group does not queue the two workflows -- it cancels one of them on every
+# push. Each workflow gets its own group, and the publish step rebases
+# instead, because both still write to the same branch.
+WORKFLOW_EXPRESSION = "${{ github.workflow }}"
+REBASE_MARKER = "pull --rebase"
+RETRY_MARKER = "for attempt in"
+
 needs_yaml = unittest.skipIf(yaml is None, "PyYAML not installed")
 
 
@@ -107,11 +115,38 @@ class WorkflowContractTest(unittest.TestCase):
                     script, rf"push\s+(--force|-f)\s+origin\s+{PUBLISH_BRANCH}"
                 )
 
-    def test_both_workflows_share_a_concurrency_group(self) -> None:
-        self.assertEqual(
-            self.terminal["concurrency"]["group"],
-            self.stats["concurrency"]["group"],
-        )
+    def test_the_workflows_do_not_cancel_each_other(self) -> None:
+        """Regression: one shared group meant every push cancelled one of the
+        two workflows, because GitHub keeps a single pending run per group."""
+        # The two files hold the same literal; what matters is that the
+        # literal is an expression GitHub expands per workflow, never a
+        # constant both of them resolve to.
+        for name, workflow in (("terminal", self.terminal), ("stats", self.stats)):
+            with self.subTest(workflow=name):
+                self.assertNotEqual(
+                    workflow["concurrency"]["group"],
+                    PUBLISH_BRANCH,
+                    "a constant group is shared by both workflows, so every "
+                    "push leaves one of them cancelled",
+                )
+
+    def test_each_group_still_serialises_a_workflow_against_itself(self) -> None:
+        for name, workflow in (("terminal", self.terminal), ("stats", self.stats)):
+            with self.subTest(workflow=name):
+                group = workflow["concurrency"]["group"]
+                self.assertIn(WORKFLOW_EXPRESSION, group)
+                self.assertIn(PUBLISH_BRANCH, group)
+                self.assertFalse(workflow["concurrency"]["cancel-in-progress"])
+
+    def test_publishing_retries_when_the_other_workflow_pushed_first(self) -> None:
+        """The workflows no longer take turns, so both may reach the branch at
+        once: whoever loses the race has to rebase and try again."""
+        for name, workflow in (("terminal", self.terminal), ("stats", self.stats)):
+            with self.subTest(workflow=name):
+                steps = workflow["jobs"]["build"]["steps"]
+                script = "\n".join(step.get("run", "") for step in steps)
+                self.assertIn(REBASE_MARKER, script)
+                self.assertIn(RETRY_MARKER, script)
 
     def test_first_party_actions_run_on_a_supported_node_runtime(self) -> None:
         """Regression: checkout@v4 and setup-python@v5 target Node 20, which
