@@ -23,6 +23,8 @@ $ ls ~/projects
                        automation (discord.js)
   xlsx-to-insert-into/ turns spreadsheets into ready-to-run SQL
                        INSERT statements
+  vwinck-dev/          this profile — the terminal you are reading is
+                       generated from a text file by a python package
 
 $ composer global show | grep -E 'boardflow|vwinck'
 
