@@ -1,6 +1,6 @@
 $ whoami
 
-  Valentine Winck — fullstack devsecops, Brazil
+  V. Winck — fullstack devsecops, Brazil
   PHP · Laravel · clean architecture · software engineering undergrad
 
 $ cat ~/now
