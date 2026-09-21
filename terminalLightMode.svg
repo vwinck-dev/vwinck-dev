@@ -4,7 +4,7 @@
 <text id="p0" class="prompt" x="20.00" y="35.60" xml:space="preserve">vwinck-dev@arch ~ $ </text>
 <text id="c0" class="cmd" x="176.00" y="35.60" xml:space="preserve">whoami</text>
 <rect id="u0" class="cursor" x="176.00" y="22.60" width="6.63" height="14.95" />
-<text id="o2" class="out" x="20.00" y="75.90" xml:space="preserve">  Valentine Winck — fullstack devsecops, Brazil</text>
+<text id="o2" class="out" x="20.00" y="75.90" xml:space="preserve">  V. Winck — fullstack devsecops, Brazil</text>
 <text id="o3" class="out" x="20.00" y="96.05" xml:space="preserve">  PHP · Laravel · clean architecture · software engineering undergrad</text>
 <text id="p5" class="prompt" x="20.00" y="136.35" xml:space="preserve">vwinck-dev@arch ~ $ </text>
 <text id="c5" class="cmd" x="176.00" y="136.35" xml:space="preserve">cat ~/now</text>
