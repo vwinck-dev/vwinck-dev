@@ -28,6 +28,7 @@ import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
+from logo_svg.theme import THEMES as LOGO_THEMES
 from terminal_svg.theme import THEMES
 
 REPO = Path(__file__).resolve().parents[2]
@@ -62,10 +63,29 @@ def readme_references() -> set[str]:
     return set(re.findall(pattern, README.read_text(encoding="utf-8")))
 
 
+IMG_TAG = re.compile(r"<img\b[^>]*>")
+
+
 class ReadmeContractTest(unittest.TestCase):
     def test_readme_references_every_file_the_generator_produces(self) -> None:
         produced = {theme.filename for theme in THEMES}
         self.assertTrue(produced <= readme_references())
+
+    def test_readme_references_both_banners(self) -> None:
+        produced = {theme.filename for theme in LOGO_THEMES}
+        self.assertTrue(produced <= readme_references())
+
+    def test_readme_references_no_banner_nobody_produces(self) -> None:
+        produced = {theme.filename for theme in LOGO_THEMES}
+        referenced = {name for name in readme_references() if name.startswith("logo")}
+        self.assertEqual(referenced - produced, set())
+
+    def test_every_image_scales_with_the_column(self) -> None:
+        """The images share one width so their edges line up; a relative
+        width keeps them lined up when GitHub's column is narrower."""
+        for tag in IMG_TAG.findall(README.read_text(encoding="utf-8")):
+            with self.subTest(tag=tag[:80]):
+                self.assertRegex(tag, r'width="\d+%"')
 
     def test_readme_references_no_terminal_file_nobody_produces(self) -> None:
         produced = {theme.filename for theme in THEMES}
@@ -103,6 +123,20 @@ class WorkflowContractTest(unittest.TestCase):
 
     def test_terminal_can_be_triggered_by_hand(self) -> None:
         self.assertIn("workflow_dispatch", self.terminal_on)
+
+    def test_the_terminal_workflow_also_renders_the_banner(self) -> None:
+        steps = self.terminal["jobs"]["build"]["steps"]
+        script = "\n".join(step.get("run", "") for step in steps)
+        self.assertIn("scripts/build_logo.py", script)
+
+    def test_stats_cards_are_restyled_for_both_themes(self) -> None:
+        """Regression guard: the cards used to be recoloured by sed, which
+        broke silently whenever upstream changed a value."""
+        steps = self.stats["jobs"]["build"]["steps"]
+        script = "\n".join(step.get("run", "") for step in steps)
+        for theme in ("dark", "light"):
+            with self.subTest(theme=theme):
+                self.assertRegex(script, rf"restyle_stats\.py\s+--theme\s+{theme}")
 
     def test_neither_workflow_force_pushes_the_shared_branch(self) -> None:
         """Both publish to actions_branch; a force push would delete the

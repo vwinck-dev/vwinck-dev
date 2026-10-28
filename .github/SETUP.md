@@ -1,7 +1,11 @@
 # Setup
 
-The README embeds four stats cards served from the `actions_branch` branch.
-They are produced by [`.github/workflows/stats.yml`](workflows/stats.yml),
+The README is one column of images, all served from the `actions_branch`
+branch: the animated vwinck-dev banner, two stats cards side by side, and the
+animated terminal. Every image follows the brand manual (colours, Geist Mono,
+the light-background rule) through the shared `scripts/brand/` package.
+
+The four stats card files (two cards, two themes each) are produced by [`.github/workflows/stats.yml`](workflows/stats.yml),
 which runs daily at 05:00 UTC and can be triggered by hand from the Actions
 tab.
 
@@ -33,10 +37,54 @@ GitHub does not tell an embedded SVG which theme the reader is using, so the
 theme has to be picked when the file is served. The README relies on the
 `#gh-dark-mode-only` and `#gh-light-mode-only` fragments, which means each card
 needs two separate files. The workflow therefore runs the generator twice,
-rewriting the palette in the SVG templates between runs.
+dressing a fresh copy of its templates in each theme first with
+[`scripts/restyle_stats.py`](../scripts/restyle_stats.py). That script appends
+a brand stylesheet after the template's own instead of rewriting upstream's
+colours, so the cascade keeps working whatever upstream changes, and it widens
+each card to half the column so the two sit flush with the images around them.
+
+The light themes follow the manual's rule for light backgrounds: blue and pink
+are too faint on white, so there they only ever fill a shape outlined in
+Terminal (`#16181A`) -- never a line, never text.
 
 Credit for the generator: [rahul-jha98/github-stats-transparent](https://github.com/rahul-jha98/github-stats-transparent),
 itself a fork of [jstrieb/github-stats](https://github.com/jstrieb/github-stats).
+
+## The layout
+
+Every image is `LAYOUT_WIDTH` (800px, in `scripts/brand/layout.py`) wide and
+draws its card 5px in, like the stats generator does, so all the edges line up
+into one column. The README gives the full-width images `width="100%"` and the
+stats cards `width="50%"`, so the column stays aligned even when GitHub's is
+narrower than 800px.
+
+## The animated banner
+
+[`scripts/build_logo.py`](../scripts/build_logo.py) renders
+`logoDarkMode.svg` / `logoLightMode.svg`: the manual's horizontal signature,
+animated. The git graph is drawn left to right -- the blue V branch, the eye
+opening at the merge, the pink W branch -- then the eye winks for the first
+time as `vw;nck` types itself out with a smaller `-dev` beside it, followed by
+the tagline. From then on the eye keeps blinking on the manual's cycle (once
+every 3s, shut for 0.4s); everything else plays once. With
+`prefers-reduced-motion` it shows the resting logo, eye closed.
+
+The symbol's geometry, in the manual's 280 x 140 units, lives in
+`scripts/logo_svg/symbol.py`; the tempo in `PACE` in
+`scripts/logo_svg/choreography.py`. The terminal workflow renders it on every
+push, alongside the terminal.
+
+## The font
+
+An SVG shown through `<img>` may not fetch anything, so Geist Mono travels
+inside each file as a `data:` URI. The subsets in `assets/fonts/` (Latin only,
+about 7 KB per weight, OFL-licensed) are committed so the build stays
+stdlib-only. To pick up a new Geist release:
+
+```
+pip install fonttools brotli
+python3 scripts/subset_fonts.py path/to/geist-font/GeistMono/ttf
+```
 
 ## The animated terminal
 
@@ -44,9 +92,9 @@ itself a fork of [jstrieb/github-stats](https://github.com/jstrieb/github-stats)
 of the README. Lines opening with `$ ` are typed out; everything else is
 output. Edit that file and nothing else.
 
-[`.github/workflows/terminal.yml`](workflows/terminal.yml) watches it and
-re-renders `terminalDarkMode.svg` / `terminalLightMode.svg` into
-`actions_branch` on every push that touches it. The generator,
+[`.github/workflows/terminal.yml`](workflows/terminal.yml) re-renders
+`terminalDarkMode.svg` / `terminalLightMode.svg`, together with the banner,
+into `actions_branch` on every push. The generator,
 [`scripts/build_terminal.py`](../scripts/build_terminal.py), is stdlib-only
 and needs no secret, so it keeps working even while the stats workflow is
 failing.
@@ -64,19 +112,21 @@ shows a finished terminal.
 
 ```
 docker compose run --rm test     # the suite
-docker compose run --rm build    # regenerate into out/
+docker compose run --rm build    # regenerate the banner and terminal into out/
 ```
 
-Both work without Docker too -- the generator is stdlib-only:
+Both work without Docker too -- the generators are stdlib-only:
 
 ```
 python3 -m unittest discover -s scripts/tests -t scripts
+python3 scripts/build_logo.py --out-dir out
 python3 scripts/build_terminal.py --source terminal.txt --out-dir out
 ```
 
 Enable the commit hook once per clone. It runs the suite when anything under
-`scripts/` is staged, and re-renders the terminal when `terminal.txt` changes,
-so a commit can never leave the published SVG behind the source:
+`scripts/` or `assets/` is staged, and re-renders the banner and the terminal
+when they or `terminal.txt` change, so a commit can never break what gets
+published:
 
 ```
 git config core.hooksPath .githooks

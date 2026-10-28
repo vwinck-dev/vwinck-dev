@@ -17,6 +17,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
+from brand import LAYOUT_WIDTH
 from terminal_svg.animation import KeyframeFactory
 from terminal_svg.builder import TerminalSvgBuilder
 from terminal_svg.cadence import Cadence
@@ -40,7 +41,7 @@ CADENCE = Cadence(
     hold_at_end=2.0,
 )
 
-SCRIPT_TEXT = "$ whoami\n\n  Valentine\n"
+SCRIPT_TEXT = "$ whoami\n\n  V. Winck\n"
 
 
 def build_timeline(text: str = SCRIPT_TEXT) -> tuple[TerminalScript, Timeline]:
@@ -177,9 +178,16 @@ class RendererTest(unittest.TestCase):
         durations = set(re.findall(r"animation-duration:([^;}]+)", self.svg))
         self.assertEqual(len(durations), 1)
 
-    def test_canvas_is_sized_from_the_widest_line(self) -> None:
-        expected = METRICS.width_for_columns(self.script.widest_line + 1)
-        self.assertIn(f'width="{expected:.0f}"', self.svg)
+    def test_canvas_is_never_narrower_than_the_profile_column(self) -> None:
+        self.assertIn(f'width="{LAYOUT_WIDTH:.0f}"', self.svg)
+
+    def test_canvas_grows_when_a_line_would_not_fit(self) -> None:
+        wide = "$ " + "x" * 200
+        script, timeline = build_timeline(wide)
+        svg = TerminalSvgRenderer(script, timeline).render(THEME_DARK)
+        expected = METRICS.width_for_columns(script.widest_line + 1)
+        self.assertGreater(expected, LAYOUT_WIDTH)
+        self.assertIn(f'width="{expected:.0f}"', svg)
 
     def test_themes_differ_only_in_colour(self) -> None:
         light = self.renderer.render(THEME_LIGHT)

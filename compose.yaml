@@ -6,7 +6,7 @@
 # Full terms in the LICENSE file at the repository root.
 
 # docker compose run --rm test     -> run the suite
-# docker compose run --rm build    -> regenerate the terminal SVGs into out/
+# docker compose run --rm build    -> regenerate the banner and terminal SVGs into out/
 #
 # Both mount the repo, so build writes straight back onto the host.
 
@@ -27,4 +27,6 @@ services:
 
   build:
     <<: *python
-    command: python3 scripts/build_terminal.py --source terminal.txt --out-dir out
+    command: >-
+      sh -c "python3 scripts/build_logo.py --out-dir out &&
+             python3 scripts/build_terminal.py --source terminal.txt --out-dir out"

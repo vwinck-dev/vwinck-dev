@@ -11,6 +11,8 @@ from __future__ import annotations
 
 from typing import Mapping
 
+from brand import LAYOUT_WIDTH
+
 from .animation import KeyframeFactory
 from .document import Canvas, SvgDocument
 from .geometry import METRICS, Metrics
@@ -53,8 +55,10 @@ class TerminalSvgRenderer:
 
     def _canvas(self) -> Canvas:
         columns = self._script.widest_line + CURSOR_MARGIN_COLUMNS
+        # Never narrower than the banner and the stats row, so the profile
+        # reads as one column; wider only if a line would not fit.
         return Canvas(
-            width=self._metrics.width_for_columns(columns),
+            width=max(LAYOUT_WIDTH, self._metrics.width_for_columns(columns)),
             height=self._metrics.height_for_rows(len(self._script)),
         )
 

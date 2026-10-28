@@ -56,9 +56,11 @@ class SvgDocument:
 
     def _background(self) -> str:
         radius = self._metrics.border_radius
+        # Half a pixel more so the 1px border lands on whole pixels.
+        inset = self._metrics.card_inset + 0.5
         return (
-            f'<rect id="{CssClass.BACKGROUND.value}" x="0.5" y="0.5" '
-            f'width="{self._canvas.width - 1:.0f}" '
-            f'height="{self._canvas.height - 1:.0f}" '
+            f'<rect id="{CssClass.BACKGROUND.value}" x="{inset}" y="{inset}" '
+            f'width="{self._canvas.width - 2 * inset:.0f}" '
+            f'height="{self._canvas.height - 2 * inset:.0f}" '
             f'rx="{radius}" ry="{radius}" />'
         )

@@ -9,8 +9,10 @@
 
 from __future__ import annotations
 
+from brand import FONT_STACK, font_faces
+
 from .animation import CssClass, KeyframeFactory
-from .geometry import FONT_STACK, Metrics
+from .geometry import Metrics
 from .theme import Palette
 
 #: The session plays once and holds its final state. A README is read, not
@@ -28,6 +30,7 @@ class StyleSheet:
     def render(self, palette: Palette, metrics: Metrics, cycle_seconds: float) -> str:
         return "".join(
             (
+                font_faces(),
                 self._typography(metrics),
                 self._colours(palette),
                 self._animation_defaults(cycle_seconds),
