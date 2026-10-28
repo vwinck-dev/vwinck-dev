@@ -63,9 +63,11 @@ narrower than 800px.
 [`scripts/build_logo.py`](../scripts/build_logo.py) renders
 `logoDarkMode.svg` / `logoLightMode.svg`: the manual's horizontal signature,
 animated. The git graph is drawn left to right -- the blue V branch, the eye
-opening at the merge, the pink W branch -- then the eye winks shut (the
-manual's resting state) as `vw;nck` types itself out, followed by `dev` beneath it.
-It plays once; with `prefers-reduced-motion` it shows the resting logo.
+opening at the merge, the pink W branch -- then the eye winks for the first
+time as `vw;nck` types itself out with a smaller `-dev` beside it, followed by
+the tagline. From then on the eye keeps blinking on the manual's cycle (once
+every 3s, shut for 0.4s); everything else plays once. With
+`prefers-reduced-motion` it shows the resting logo, eye closed.
 
 The symbol's geometry, in the manual's 280 x 140 units, lives in
 `scripts/logo_svg/symbol.py`; the tempo in `PACE` in

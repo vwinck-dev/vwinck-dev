@@ -7,11 +7,15 @@
 
 """The banner: the horizontal signature, animated, on a card.
 
-Every element is styled in its *final* state, and each animation runs from an
-earlier state to that one with ``animation-fill-mode: both``. Two things fall
-out of that: before its cue an element sits in its starting state, and a
-reader with ``prefers-reduced-motion`` -- for whom every animation is switched
-off -- sees the static logo the manual calls the resting state.
+Every element is styled in its *resting* state -- the static logo, eye
+closed -- and each animation runs from an earlier state to that one with
+``animation-fill-mode: both``. Two things fall out of that: before its cue an
+element sits in its starting state, and a reader with
+``prefers-reduced-motion`` -- for whom every animation is switched off -- sees
+the static logo the manual calls the resting state.
+
+The one thing that never rests is the eye: once the graph is drawn it blinks
+on the manual's cycle for as long as the banner is on screen.
 """
 
 from __future__ import annotations
@@ -19,9 +23,17 @@ from __future__ import annotations
 from dataclasses import dataclass
 from xml.sax.saxutils import escape
 
-from brand import CARD_INSET, CARD_RADIUS, FONT_STACK, LAYOUT_WIDTH, BRANCO, FontWeight, font_faces
+from brand import (
+    BRANCO,
+    CARD_INSET,
+    CARD_RADIUS,
+    FONT_STACK,
+    LAYOUT_WIDTH,
+    FontWeight,
+    font_faces,
+)
 
-from .choreography import PACE, Choreography, Cue, Pace, choreograph
+from .choreography import PACE, Blink, Choreography, Cue, Pace, choreograph
 from .symbol import (
     COMMIT_RADIUS,
     EYE,
@@ -39,11 +51,13 @@ NEWLINE = "\n"
 
 #: The manual's wordmark: "i" is always replaced by ";".
 WORDMARK = ("vw", ";", "nck")
-#: The descriptor under the wordmark, where the manual's signature puts DEV.
-TITLE = "dev"
+#: Set smaller beside the wordmark, completing the brand name.
+SUFFIX = "-dev"
+#: What the studio is, under the signature.
+TAGLINE = "V. Winck's programming studio"
 CAPTION_LEFT = ("main", " + ", "feature", " → merge")
 CAPTION_RIGHT = "fullstack devsecops · brazil"
-LABEL = "vwinck-dev"
+LABEL = "vwinck-dev — V. Winck's programming studio"
 
 EDGE_NAMES = frozenset(
     mark.name for mark in (*V_BRANCH, *W_BRANCH) if isinstance(mark, Edge)
@@ -59,8 +73,11 @@ CURSOR_BLINK_SECONDS = 0.9
 #: 100% left Chrome a hair short of it (progress 0.9999999999999994), and
 #: steps(n,end) floored that to n-1 -- the title rested one glyph short.
 TYPED_AT_PERCENT = 90
-#: How long the cursor lingers, blinking, once the title is typed.
+#: How long the cursor lingers, blinking, once the tagline is typed.
 CURSOR_LINGER_SECONDS = 2.7
+#: How flat the eye gets mid-blink, and how flat the lid starts.
+EYE_SQUASH = 0.1
+LID_SQUASH = 0.3
 
 
 @dataclass(frozen=True)
@@ -76,9 +93,11 @@ class BannerLayout:
     wordmark_size: float = 72.0
     #: Wordmark baseline, below ``centre_y``.
     wordmark_drop: float = 12.0
-    title_size: float = 20.0
-    #: Title baseline, below the wordmark baseline.
-    title_drop: float = 36.0
+    #: ``-dev`` shares the wordmark's baseline at a smaller size.
+    suffix_size: float = 30.0
+    tagline_size: float = 18.0
+    #: Tagline baseline, below the wordmark baseline.
+    tagline_drop: float = 36.0
     caption_size: float = 12.0
     #: Caption baseline, up from the bottom edge.
     caption_rise: float = 30.0
@@ -93,8 +112,14 @@ class BannerLayout:
         return sum(map(len, WORDMARK)) * self.wordmark_size * CHAR_WIDTH_RATIO
 
     @property
+    def signature_width(self) -> float:
+        suffix = len(SUFFIX) * self.suffix_size * CHAR_WIDTH_RATIO
+        tagline = len(TAGLINE) * self.tagline_size * CHAR_WIDTH_RATIO
+        return max(self.wordmark_width + suffix, tagline)
+
+    @property
     def symbol_x(self) -> float:
-        content = self.symbol_width + self.gap + self.wordmark_width
+        content = self.symbol_width + self.gap + self.signature_width
         return (self.width - content) / 2
 
     @property
@@ -106,12 +131,16 @@ class BannerLayout:
         return self.symbol_x + self.symbol_width + self.gap
 
     @property
+    def suffix_x(self) -> float:
+        return self.text_x + self.wordmark_width
+
+    @property
     def wordmark_baseline(self) -> float:
         return self.centre_y + self.wordmark_drop
 
     @property
-    def title_baseline(self) -> float:
-        return self.wordmark_baseline + self.title_drop
+    def tagline_baseline(self) -> float:
+        return self.wordmark_baseline + self.tagline_drop
 
     @property
     def caption_baseline(self) -> float:
@@ -126,7 +155,8 @@ class BannerRenderer:
         self._layout = layout
         self._cues = choreograph(
             wordmark_chars=sum(map(len, WORDMARK)),
-            title_chars=len(TITLE),
+            suffix_chars=len(SUFFIX),
+            tagline_chars=len(TAGLINE),
             pace=pace,
         )
 
@@ -144,7 +174,7 @@ class BannerRenderer:
                 f'viewBox="0 0 {layout.width:.0f} {layout.height:.0f}" '
                 f'role="img" aria-label="{escape(LABEL)}">',
                 f"<title>{escape(LABEL)}</title>",
-                f"<style>{self._stylesheet(palette)}</style>",
+                f"<style>{self._stylesheet()}</style>",
                 self._card(palette),
                 self._symbol(palette),
                 self._signature(palette),
@@ -180,11 +210,14 @@ class BannerRenderer:
             else:
                 commits.append(self._commit(mark.name, mark, palette))
         eye = EYE.centre
+        # The group pops the eye in once; the circle inside it blinks forever.
+        # Two elements, because one element cannot run two transforms.
         open_eye = (
+            f'<g id="eye-pop">'
             f'<circle id="eye-open" class="node" cx="{eye.x}" cy="{eye.y}" '
             f'r="{self._commit_radius(palette):.2f}" fill="{BRANCO}" '
             f'stroke="{palette.commit_outline}" '
-            f'stroke-width="{palette.commit_outline_width}" />'
+            f'stroke-width="{palette.commit_outline_width}" /></g>'
         )
         closed_eye = (
             f'<path id="eye-closed" class="edge-static" d="{EYE.closed_path}" '
@@ -227,24 +260,30 @@ class BannerRenderer:
             f'<tspan fill="{colour_semicolon}">{semicolon}</tspan>'
             f'<tspan fill="{colour_nck}">{nck}</tspan></text>'
         )
-        title = (
-            f'<text id="title" class="title" x="{layout.text_x + self._title_indent:.2f}" '
-            f'y="{layout.title_baseline:.2f}" fill="{palette.title}">'
-            f"{escape(TITLE)}</text>"
+        suffix = (
+            f'<text id="suffix" class="suffix" x="{layout.suffix_x:.2f}" '
+            f'y="{layout.wordmark_baseline:.2f}" fill="{palette.suffix}">'
+            f"{escape(SUFFIX)}</text>"
         )
-        cursor_height = layout.title_size * (1 + CURSOR_DESCENT_RATIO)
+        tagline_x = layout.text_x + self._tagline_indent
+        tagline = (
+            f'<text id="tagline" class="tagline" x="{tagline_x:.2f}" '
+            f'y="{layout.tagline_baseline:.2f}" fill="{palette.tagline}">'
+            f"{escape(TAGLINE)}</text>"
+        )
+        cursor_height = layout.tagline_size * (1 + CURSOR_DESCENT_RATIO)
         cursor = (
-            f'<rect id="cursor" x="{layout.text_x + self._title_indent:.2f}" '
-            f'y="{layout.title_baseline - layout.title_size:.2f}" '
-            f'width="{layout.title_size * CHAR_WIDTH_RATIO:.2f}" '
+            f'<rect id="cursor" x="{tagline_x:.2f}" '
+            f'y="{layout.tagline_baseline - layout.tagline_size:.2f}" '
+            f'width="{layout.tagline_size * CHAR_WIDTH_RATIO:.2f}" '
             f'height="{cursor_height:.2f}" fill="{palette.cursor}" />'
         )
-        return wordmark + title + cursor
+        return wordmark + suffix + tagline + cursor
 
     @property
-    def _title_indent(self) -> float:
+    def _tagline_indent(self) -> float:
         # Geist Mono's "v" sits a hair inside its cell at 72px; nudging the
-        # title by the same amount lines the two left edges up optically.
+        # tagline by the same amount lines the two left edges up optically.
         return self._layout.wordmark_size * 0.04
 
     def _caption(self, palette: LogoPalette) -> str:
@@ -266,29 +305,33 @@ class BannerRenderer:
 
     # -- style ------------------------------------------------------------
 
-    def _stylesheet(self, palette: LogoPalette) -> str:
+    def _stylesheet(self) -> str:
         layout = self._layout
         cues = self._cues
         return "".join(
             (
                 font_faces((FontWeight.REGULAR, FontWeight.SEMIBOLD)),
                 f"text{{font-family:{FONT_STACK};white-space:pre;}}",
-                f".wordmark{{font-size:{layout.wordmark_size}px;font-weight:600;"
-                f"letter-spacing:0;}}",
-                f".title{{font-size:{layout.title_size}px;font-weight:400;}}",
+                f".wordmark{{font-size:{layout.wordmark_size}px;font-weight:600;}}",
+                f".suffix{{font-size:{layout.suffix_size}px;font-weight:600;}}",
+                f".tagline{{font-size:{layout.tagline_size}px;font-weight:400;}}",
                 f".caption{{font-size:{layout.caption_size}px;letter-spacing:0.04em;}}",
                 f".edge,.edge-static{{fill:none;stroke-width:{STROKE};"
                 f"stroke-linecap:round;}}",
                 ".edge{stroke-dasharray:1;}",
-                ".node,#eye-closed{transform-box:fill-box;transform-origin:center;}",
+                ".node,#eye-pop,#eye-closed{transform-box:fill-box;"
+                "transform-origin:center;}",
                 "#eye-open{opacity:0;}",
                 "#cursor{visibility:hidden;}",
                 self._keyframes(),
                 "".join(self._bind(name, cue) for name, cue in cues.marks.items()),
-                self._bind_eye(cues),
+                # The eye pops in like a commit, then blinks.
+                self._bind("eye-pop", cues.eye_opens),
+                self._bind_blink(cues.blink),
                 self._bind_typing("wordmark", cues.wordmark, sum(map(len, WORDMARK))),
-                self._bind_typing("title", cues.title, len(TITLE)),
-                self._bind_cursor(cues.title),
+                self._bind_typing("suffix", cues.suffix, len(SUFFIX)),
+                self._bind_typing("tagline", cues.tagline, len(TAGLINE)),
+                self._bind_cursor(cues.tagline),
                 f"#caption{{animation:fade {cues.caption.duration:.3f}s ease-out "
                 f"{cues.caption.starts_at:.3f}s 1 both;}}",
                 "@media (prefers-reduced-motion:reduce){*{animation:none!important;}}",
@@ -302,8 +345,6 @@ class BannerRenderer:
             "70%{transform:scale(1.15);}100%{transform:scale(1);}}"
             "@keyframes draw{0%{stroke-dashoffset:1;opacity:0;}"
             "1%{opacity:1;}100%{stroke-dashoffset:0;opacity:1;}}"
-            "@keyframes shut{0%{transform:scaleY(0.15);opacity:0;}"
-            "100%{transform:scaleY(1);opacity:1;}}"
             "@keyframes fade{0%{opacity:0;transform:translateY(4px);}"
             "100%{opacity:1;transform:translateY(0);}}"
             "@keyframes type{0%{clip-path:inset(0 100% 0 0);}"
@@ -324,26 +365,27 @@ class BannerRenderer:
         )
 
     @staticmethod
-    def _bind_eye(cues: Choreography) -> str:
-        """Open at the merge, hold over the finished graph, then wink shut.
+    def _bind_blink(blink: Blink) -> str:
+        """The manual's cycle, forever: open, then shut for ``closed`` seconds
+        once every ``period``.
 
-        The open eye is one animation across its whole life, so its keyframes
-        are percentages of that span; the closed eye simply appears as the
-        open one collapses.
+        The open eye and the lid run the same loop in counterpoint: as the
+        circle flattens out, the arc fades in where it was. Before the first
+        wink, ``fill-mode: both`` holds each at its 0% -- eye open, lid hidden.
         """
-        opens, wink = cues.eye_opens, cues.wink
-        span = wink.ends_at - opens.starts_at
-        popped = opens.duration / span * 100
-        winking = (wink.starts_at - opens.starts_at) / span * 100
+        shut = blink.lid_travel / blink.period * 100
+        reopening = (blink.lid_travel + blink.closed) / blink.period * 100
+        reopened = (2 * blink.lid_travel + blink.closed) / blink.period * 100
+        loop = f"{blink.period:.3f}s ease-in-out {blink.starts_at:.3f}s infinite both"
         return (
-            f"@keyframes eye{{0%{{transform:scale(0);opacity:1;}}"
-            f"{popped * 0.7:.3f}%{{transform:scale(1.15);opacity:1;}}"
-            f"{popped:.3f}%,{winking:.3f}%{{transform:scale(1);opacity:1;}}"
-            f"100%{{transform:scaleY(0.1);opacity:0;}}}}"
-            f"#eye-open{{animation:eye {span:.3f}s ease-in-out "
-            f"{opens.starts_at:.3f}s 1 both;}}"
-            f"#eye-closed{{animation:shut {wink.duration:.3f}s ease-out "
-            f"{wink.starts_at + wink.duration / 2:.3f}s 1 both;}}"
+            f"@keyframes eye{{0%,{reopened:.3f}%,100%{{transform:scaleY(1);opacity:1;}}"
+            f"{shut:.3f}%,{reopening:.3f}%"
+            f"{{transform:scaleY({EYE_SQUASH});opacity:0;}}}}"
+            f"@keyframes lid{{0%,{reopened:.3f}%,100%"
+            f"{{transform:scaleY({LID_SQUASH});opacity:0;}}"
+            f"{shut:.3f}%,{reopening:.3f}%{{transform:scaleY(1);opacity:1;}}}}"
+            f"#eye-open{{animation:eye {loop};}}"
+            f"#eye-closed{{animation:lid {loop};}}"
         )
 
     @staticmethod
@@ -358,20 +400,20 @@ class BannerRenderer:
             f"steps({characters},end) {cue.starts_at:.3f}s 1 both;}}"
         )
 
-    def _bind_cursor(self, title: Cue) -> str:
-        """Walk the cursor along the title as it types, blink a few times,
+    def _bind_cursor(self, tagline: Cue) -> str:
+        """Walk the cursor along the tagline as it types, blink a few times,
         then leave the finished banner alone."""
-        travel = len(TITLE) * self._layout.title_size * CHAR_WIDTH_RATIO
-        span = title.duration + CURSOR_LINGER_SECONDS
-        typed = title.duration / span * 100
+        travel = len(TAGLINE) * self._layout.tagline_size * CHAR_WIDTH_RATIO
+        span = tagline.duration + CURSOR_LINGER_SECONDS
+        typed = tagline.duration / span * 100
         blinks = max(1, round(CURSOR_LINGER_SECONDS / CURSOR_BLINK_SECONDS))
         return (
             f"@keyframes caret{{0%{{visibility:visible;transform:translateX(0);}}"
             f"{typed:.3f}%{{visibility:visible;transform:translateX({travel:.2f}px);}}"
             f"99.99%{{visibility:visible;transform:translateX({travel:.2f}px);}}"
             f"100%{{visibility:hidden;transform:translateX({travel:.2f}px);}}}}"
-            f"#cursor{{animation:caret {span:.3f}s steps({len(TITLE)},end) "
-            f"{title.starts_at:.3f}s 1 forwards,"
+            f"#cursor{{animation:caret {span:.3f}s steps({len(TAGLINE)},end) "
+            f"{tagline.starts_at:.3f}s 1 forwards,"
             f"blink {CURSOR_BLINK_SECONDS}s step-end "
-            f"{title.ends_at:.3f}s {blinks};}}"
+            f"{tagline.ends_at:.3f}s {blinks};}}"
         )

@@ -22,7 +22,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from brand import AZUL, ROSA, TERMINAL, FontWeight, font_faces
 from logo_svg.builder import BannerBuilder
 from logo_svg.choreography import choreograph
-from logo_svg.renderer import TITLE, WORDMARK, BannerRenderer
+from logo_svg.renderer import SUFFIX, TAGLINE, WORDMARK, BannerRenderer
 from logo_svg.symbol import (
     EYE,
     EYE_GAP,
@@ -78,7 +78,7 @@ class SymbolTest(unittest.TestCase):
 
 class ChoreographyTest(unittest.TestCase):
     def setUp(self) -> None:
-        self.cues = choreograph(wordmark_chars=6, title_chars=8)
+        self.cues = choreograph(wordmark_chars=6, suffix_chars=4, tagline_chars=29)
 
     def test_marks_start_in_drawing_order(self) -> None:
         names = [mark.name for mark in (*V_BRANCH, *W_BRANCH)]
@@ -91,14 +91,21 @@ class ChoreographyTest(unittest.TestCase):
         self.assertGreaterEqual(self.cues.eye_opens.starts_at, last_v.ends_at)
         self.assertLessEqual(self.cues.eye_opens.starts_at, first_w.starts_at)
 
-    def test_the_wink_waits_for_the_whole_graph(self) -> None:
+    def test_the_first_wink_waits_for_the_whole_graph(self) -> None:
         graph_done = max(cue.ends_at for cue in self.cues.marks.values())
-        self.assertGreater(self.cues.wink.starts_at, graph_done)
+        self.assertGreater(self.cues.blink.starts_at, graph_done)
 
-    def test_the_signature_arrives_with_the_wink_and_the_title_after(self) -> None:
-        self.assertEqual(self.cues.wordmark.starts_at, self.cues.wink.starts_at)
-        self.assertGreater(self.cues.title.starts_at, self.cues.wordmark.ends_at)
-        self.assertGreaterEqual(self.cues.caption.starts_at, self.cues.title.ends_at)
+    def test_the_eye_blinks_on_the_manuals_cycle(self) -> None:
+        """Manual: one blink every 3s, eye shut for 0.4s."""
+        self.assertEqual(self.cues.blink.period, 3.0)
+        self.assertEqual(self.cues.blink.closed, 0.4)
+
+    def test_the_signature_arrives_with_the_wink_then_dev_then_the_tagline(self) -> None:
+        cues = self.cues
+        self.assertEqual(cues.wordmark.starts_at, cues.blink.starts_at)
+        self.assertEqual(cues.suffix.starts_at, cues.wordmark.ends_at)
+        self.assertGreater(cues.tagline.starts_at, cues.suffix.ends_at)
+        self.assertGreaterEqual(cues.caption.starts_at, cues.tagline.ends_at)
 
 
 class BannerTest(unittest.TestCase):
@@ -126,9 +133,11 @@ class BannerTest(unittest.TestCase):
             with self.subTest(mark=mark.name):
                 self.assertIn(f"#{mark.name}{{animation:", self.dark)
 
-    def test_nothing_loops_forever(self) -> None:
-        """Like the terminal, the banner plays once and rests."""
-        self.assertNotIn("infinite", self.dark)
+    def test_only_the_eye_keeps_moving(self) -> None:
+        """The eye blinks for as long as the banner is on screen; everything
+        else plays once and rests, like the terminal."""
+        looping = re.findall(r"#([\w-]+)\{animation:[^}]*infinite", self.dark)
+        self.assertEqual(sorted(looping), ["eye-closed", "eye-open"])
 
     def test_reduced_motion_readers_get_the_resting_logo(self) -> None:
         self.assertIn("prefers-reduced-motion", self.dark)
@@ -139,7 +148,8 @@ class BannerTest(unittest.TestCase):
 
     def test_the_wordmark_and_title_are_typed(self) -> None:
         self.assertIn(f"steps({sum(map(len, WORDMARK))},end)", self.dark)
-        self.assertIn(f"steps({len(TITLE)},end)", self.dark)
+        self.assertIn(f"steps({len(SUFFIX)},end)", self.dark)
+        self.assertIn(f"steps({len(TAGLINE)},end)", self.dark)
 
     def test_typing_lands_before_the_animation_ends(self) -> None:
         """Regression: Chrome finished the title at progress 0.99999...,
@@ -175,12 +185,18 @@ class BannerTest(unittest.TestCase):
 
     def test_the_label_names_the_brand(self) -> None:
         root = ElementTree.fromstring(self.dark)
-        self.assertEqual(root.get("aria-label"), "vwinck-dev")
+        self.assertTrue(root.get("aria-label").startswith("vwinck-dev"))
 
-    def test_the_descriptor_under_the_wordmark_is_dev(self) -> None:
-        """As in the manual's horizontal signature; no personal name."""
-        self.assertEqual(TITLE, "dev")
-        self.assertNotIn("Winck", self.dark)
+    def test_dev_sits_beside_the_wordmark_on_its_baseline(self) -> None:
+        root = ElementTree.fromstring(self.dark)
+        texts = {t.get("id"): t for t in root.iter(f"{SVG_NS}text")}
+        wordmark, suffix = texts["wordmark"], texts["suffix"]
+        self.assertEqual(suffix.text, "-dev")
+        self.assertEqual(suffix.get("y"), wordmark.get("y"))
+        self.assertGreater(float(suffix.get("x")), float(wordmark.get("x")))
+
+    def test_the_tagline_never_prints_the_full_name(self) -> None:
+        self.assertTrue(TAGLINE.startswith("V. Winck's"))
 
     def test_the_font_travels_inside_the_file(self) -> None:
         self.assertIn("data:font/woff2;base64,", self.dark)

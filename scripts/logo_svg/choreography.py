@@ -9,8 +9,10 @@
 
 The story, left to right: the V branch is committed and climbs to the merge,
 the eye opens there, the W branch leaves it and makes the W. Once the graph is
-whole the eye winks shut -- the manual's resting state -- and the signature
-types itself out beside it, then the title, then the caption fades in.
+whole the eye winks for the first time and the signature types itself out
+beside it -- ``vw;nck``, then ``-dev`` -- followed by the tagline, then the
+caption fades in. From the first wink on, the eye keeps blinking on the
+manual's cycle.
 
 Knows nothing about SVG: it turns a ``Pace`` into seconds per element.
 """
@@ -38,14 +40,19 @@ class Pace:
         Grid units per second a branch line is drawn at. Speed, not duration,
         so a long leg takes longer than a short one.
     ``eye_hold``
-        How long the eye stays open over the finished graph before winking.
-    ``wink``
-        Length of the wink itself. The manual's blink keeps the eye shut for
-        0.4s; closing is a fraction of that.
+        How long the eye stays open over the finished graph before the first
+        wink.
+    ``blink_every``
+        The manual's cycle: one blink every 3s...
+    ``blink_closed``
+        ...with the eye shut for 0.4s.
+    ``lid_travel``
+        How long the eye takes to shut, and again to open. Slow enough to
+        read as a blink rather than a flicker.
     ``seconds_per_char``
-        Typing speed of the signature and the title.
-    ``title_pause``
-        Beat between the signature and the title.
+        Typing speed of the signature and the tagline.
+    ``tagline_pause``
+        Beat between the signature and the tagline.
     ``caption_fade``
         Fade-in of the footer caption.
     """
@@ -55,9 +62,11 @@ class Pace:
     commit_overlap: float = 0.5
     draw_speed: float = 360.0
     eye_hold: float = 0.55
-    wink: float = 0.18
+    blink_every: float = 3.0
+    blink_closed: float = 0.4
+    lid_travel: float = 0.25
     seconds_per_char: float = 0.075
-    title_pause: float = 0.3
+    tagline_pause: float = 0.3
     caption_fade: float = 0.7
 
 
@@ -77,21 +86,36 @@ class Cue:
 
 
 @dataclass(frozen=True)
+class Blink:
+    """The eye's loop: starts with the first wink and never stops."""
+
+    starts_at: float
+    period: float
+    closed: float
+    lid_travel: float
+
+
+@dataclass(frozen=True)
 class Choreography:
     marks: dict[str, Cue]
     eye_opens: Cue
-    wink: Cue
+    blink: Blink
     wordmark: Cue
-    title: Cue
+    suffix: Cue
+    tagline: Cue
     caption: Cue
 
     @property
     def settles_at(self) -> float:
+        """When everything but the blinking eye has come to rest."""
         return self.caption.ends_at
 
 
 def choreograph(
-    wordmark_chars: int, title_chars: int, pace: Pace = PACE
+    wordmark_chars: int,
+    suffix_chars: int,
+    tagline_chars: int,
+    pace: Pace = PACE,
 ) -> Choreography:
     marks: dict[str, Cue] = {}
     clock = pace.lead_in
@@ -116,17 +140,26 @@ def choreograph(
     walk(W_BRANCH)
 
     graph_done = max(cue.ends_at for cue in marks.values())
-    wink = Cue(graph_done + pace.eye_hold, pace.wink)
-    wordmark = Cue(wink.starts_at, wordmark_chars * pace.seconds_per_char)
-    title = Cue(
-        wordmark.ends_at + pace.title_pause, title_chars * pace.seconds_per_char
+    blink = Blink(
+        starts_at=graph_done + pace.eye_hold,
+        period=pace.blink_every,
+        closed=pace.blink_closed,
+        lid_travel=pace.lid_travel,
     )
-    caption = Cue(title.ends_at, pace.caption_fade)
+
+    def typed(starts_at: float, characters: int) -> Cue:
+        return Cue(starts_at, characters * pace.seconds_per_char)
+
+    wordmark = typed(blink.starts_at, wordmark_chars)
+    suffix = typed(wordmark.ends_at, suffix_chars)
+    tagline = typed(suffix.ends_at + pace.tagline_pause, tagline_chars)
+    caption = Cue(tagline.ends_at, pace.caption_fade)
     return Choreography(
         marks=marks,
         eye_opens=eye_opens,
-        wink=wink,
+        blink=blink,
         wordmark=wordmark,
-        title=title,
+        suffix=suffix,
+        tagline=tagline,
         caption=caption,
     )

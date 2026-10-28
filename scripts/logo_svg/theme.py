@@ -35,7 +35,9 @@ class LogoPalette:
     eye: str
     #: The three parts of ``vw;nck``.
     wordmark: tuple[str, str, str]
-    title: str
+    #: ``-dev`` beside the wordmark.
+    suffix: str
+    tagline: str
     muted: str
     #: ``main`` and ``feature`` in the footer caption.
     caption_branches: tuple[str, str]
@@ -58,7 +60,8 @@ THEME_DARK = LogoTheme(
         commit_outline_width=0.0,
         eye=BRANCO,
         wordmark=(AZUL, BRANCO, ROSA),
-        title=NEUTRALS_DARK.muted,
+        suffix=NEUTRALS_DARK.muted,
+        tagline=NEUTRALS_DARK.text,
         muted=NEUTRALS_DARK.muted,
         caption_branches=(AZUL, ROSA),
         cursor=ROSA,
@@ -76,7 +79,8 @@ THEME_LIGHT = LogoTheme(
         commit_outline_width=4.0,
         eye=TERMINAL,
         wordmark=(TERMINAL, TERMINAL, TERMINAL),
-        title=NEUTRALS_LIGHT.muted,
+        suffix=NEUTRALS_LIGHT.muted,
+        tagline=NEUTRALS_LIGHT.text,
         muted=NEUTRALS_LIGHT.muted,
         caption_branches=(TERMINAL, TERMINAL),
         cursor=TERMINAL,
