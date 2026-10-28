@@ -11,10 +11,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-FONT_STACK = (
-    "ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, "
-    "'Liberation Mono', monospace"
-)
+from brand import CARD_INSET, CARD_RADIUS
 
 CURSOR_WIDTH_RATIO = 0.85
 CURSOR_HEIGHT_RATIO = 1.15
@@ -25,12 +22,14 @@ class Metrics:
     """Type metrics and padding for the terminal box."""
 
     font_size: float = 13.0
-    #: Advance width of one glyph as a fraction of the font size. 0.6 is the
-    #: ratio shared by the monospace faces in FONT_STACK.
+    #: Advance width of one glyph as a fraction of the font size. 0.6 is
+    #: Geist Mono's, and the fallback faces in FONT_STACK share it.
     char_width_ratio: float = 0.6
     line_height_ratio: float = 1.55
-    padding: float = 20.0
-    border_radius: float = 6.0
+    #: From the image edge to the text: the card inset plus breathing room.
+    padding: float = CARD_INSET + 24.0
+    border_radius: float = CARD_RADIUS
+    card_inset: float = CARD_INSET
     #: Where the baseline sits inside the line box, as a fraction of the font
     #: size measured up from the bottom.
     baseline_offset_ratio: float = 0.35

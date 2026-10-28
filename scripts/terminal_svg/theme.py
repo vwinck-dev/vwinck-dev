@@ -5,11 +5,18 @@
 #
 # Full terms in the LICENSE file at the repository root.
 
-"""Colour schemes and the filenames they publish under."""
+"""Colour schemes and the filenames they publish under.
+
+The manual's terminal application: main in blue, features in pink, on the
+Terminal background. On light backgrounds blue and pink are too faint for
+text, so the light theme keeps to Terminal and greys.
+"""
 
 from __future__ import annotations
 
 from dataclasses import dataclass
+
+from brand import AZUL, BRANCO, NEUTRALS_DARK, NEUTRALS_LIGHT, ROSA, TERMINAL
 
 TRANSPARENT = "#00000000"
 
@@ -36,12 +43,12 @@ class Theme:
 
 THEME_DARK = Theme(
     palette=Palette(
-        background=TRANSPARENT,
-        border="#444c56",
-        prompt="#539bf5",
-        command="#adbac7",
-        output="#768390",
-        cursor="#adbac7",
+        background=TERMINAL,
+        border=NEUTRALS_DARK.border,
+        prompt=AZUL,
+        command=BRANCO,
+        output=NEUTRALS_DARK.text,
+        cursor=ROSA,
     ),
     filename="terminalDarkMode.svg",
 )
@@ -49,11 +56,11 @@ THEME_DARK = Theme(
 THEME_LIGHT = Theme(
     palette=Palette(
         background=TRANSPARENT,
-        border="#d0d7de",
-        prompt="#0969da",
-        command="#24292f",
-        output="#57606a",
-        cursor="#24292f",
+        border=NEUTRALS_LIGHT.border,
+        prompt=TERMINAL,
+        command=TERMINAL,
+        output=NEUTRALS_LIGHT.text,
+        cursor=TERMINAL,
     ),
     filename="terminalLightMode.svg",
 )
