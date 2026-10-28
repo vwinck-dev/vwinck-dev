@@ -5,7 +5,7 @@
 #
 # Full terms in the LICENSE file at the repository root.
 
-name: Build Terminal SVG
+name: Build Banner and Terminal SVGs
 
 # No paths filter: GitHub does not evaluate one against a force push that
 # rewrites history, which once left the README pointing at SVGs that were
@@ -38,8 +38,11 @@ jobs:
         with:
           python-version: '3.12'
 
-      # No dependencies and no secrets: the generator is stdlib-only, so this
+      # No dependencies and no secrets: the generators are stdlib-only, so this
       # runs even when the stats workflow is failing for lack of a token.
+      - name: Render the banner
+        run: python3 scripts/build_logo.py --out-dir out
+
       - name: Render the terminal
         run: python3 scripts/build_terminal.py --source terminal.txt --out-dir out
 
@@ -62,7 +65,7 @@ jobs:
           rm -rf out
           git rm -r --cached --ignore-unmatch --quiet out
           git add -- ./*.svg
-          git commit -m "Update generated terminal" || echo "no changes"
+          git commit -m "Update generated banner and terminal" || echo "no changes"
           # Both workflows run in parallel and write to the same branch, so
           # losing the race is routine: rebase onto whatever landed first and
           # try again, rather than forcing over the other one's files.
