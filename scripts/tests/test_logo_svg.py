@@ -95,10 +95,13 @@ class ChoreographyTest(unittest.TestCase):
         graph_done = max(cue.ends_at for cue in self.cues.marks.values())
         self.assertGreater(self.cues.blink.starts_at, graph_done)
 
-    def test_the_eye_blinks_on_the_manuals_cycle(self) -> None:
-        """Manual: one blink every 3s, eye shut for 0.4s."""
-        self.assertEqual(self.cues.blink.period, 3.0)
-        self.assertEqual(self.cues.blink.closed, 0.4)
+    def test_the_eye_blinks_quickly_and_rarely(self) -> None:
+        """Shut for the manual's 0.4s, but with a long open stretch between
+        blinks: the blink itself stays quick, the wait is what is slow."""
+        blink = self.cues.blink
+        self.assertEqual(blink.closed, 0.4)
+        self.assertGreaterEqual(blink.period, 7.0)
+        self.assertLessEqual(blink.lid_travel, 0.15)
 
     def test_the_signature_arrives_with_the_wink_then_dev_then_the_tagline(self) -> None:
         cues = self.cues
