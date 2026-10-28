@@ -64,7 +64,7 @@ class Pace:
     eye_hold: float = 0.55
     blink_every: float = 3.0
     blink_closed: float = 0.4
-    lid_travel: float = 0.25
+    lid_travel: float = 0.4
     seconds_per_char: float = 0.075
     tagline_pause: float = 0.3
     caption_fade: float = 0.7
