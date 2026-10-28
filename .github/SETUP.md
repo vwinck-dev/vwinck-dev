@@ -65,8 +65,8 @@ narrower than 800px.
 animated. The git graph is drawn left to right -- the blue V branch, the eye
 opening at the merge, the pink W branch -- then the eye winks for the first
 time as `vw;nck` types itself out with a smaller `-dev` beside it, followed by
-the tagline. From then on the eye keeps blinking on the manual's cycle (once
-every 3s, shut for 0.4s); everything else plays once. With
+the tagline. From then on the eye keeps blinking -- a quick blink, shut for
+the manual's 0.4s, once every 7s -- while everything else plays once. With
 `prefers-reduced-motion` it shows the resting logo, eye closed.
 
 The symbol's geometry, in the manual's 280 x 140 units, lives in

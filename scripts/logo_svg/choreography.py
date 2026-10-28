@@ -43,12 +43,13 @@ class Pace:
         How long the eye stays open over the finished graph before the first
         wink.
     ``blink_every``
-        The manual's cycle: one blink every 3s...
+        One blink every this many seconds. Longer than the manual's 3s: on a
+        profile that is read rather than watched, a blink every 3s nags.
     ``blink_closed``
-        ...with the eye shut for 0.4s.
+        How long the eye stays shut -- the manual's 0.4s.
     ``lid_travel``
-        How long the eye takes to shut, and again to open. Slow enough to
-        read as a blink rather than a flicker.
+        How long the eye takes to shut, and again to open. A real blink is
+        quick; it is the wait between blinks that should feel unhurried.
     ``seconds_per_char``
         Typing speed of the signature and the tagline.
     ``tagline_pause``
@@ -62,9 +63,9 @@ class Pace:
     commit_overlap: float = 0.5
     draw_speed: float = 360.0
     eye_hold: float = 0.55
-    blink_every: float = 3.0
+    blink_every: float = 7.0
     blink_closed: float = 0.4
-    lid_travel: float = 0.4
+    lid_travel: float = 0.1
     seconds_per_char: float = 0.075
     tagline_pause: float = 0.3
     caption_fade: float = 0.7
